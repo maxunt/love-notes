@@ -1,0 +1,5 @@
+Love Notes App
+
+To Install:
+1. Make sure cocoapods is installed
+2. Run: `pod init`

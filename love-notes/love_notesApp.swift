@@ -7,16 +7,19 @@
 
 import SwiftUI
 import Firebase
+import FirebaseAuth
 
 @main
-struct love_notesApp: App {
+struct love_notesApp: App {    
     init() {
         FirebaseApp.configure()
     }
     
+    @StateObject var user = LocalUser()
+    
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            ContentView().environmentObject(user)
         }
     }
 }

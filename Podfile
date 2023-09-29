@@ -7,4 +7,6 @@ target 'love-notes' do
 
   # Pods for love-notes
   pod 'Firebase/Firestore'
+  pod 'FirebaseUI'
+  pod 'FirebaseFirestoreSwift'
 end

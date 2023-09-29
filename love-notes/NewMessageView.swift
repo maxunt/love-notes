@@ -9,19 +9,82 @@ import SwiftUI
 
 struct NewMessageView: View {
     @State var message:String = ""
-    @State var title:String = ""
+    @State var valid:Bool?
+    @State var displayError = false
+    @State var errorMessage = ""
+    
+    @EnvironmentObject var user: LocalUser
     var body: some View {
         ZStack {
+            Color.red
+                .ignoresSafeArea()
             VStack {
-                Text("Craft a love note for {user}")
-                TextField(
-                    "Title your note? (optional)",
-                    text: $title
-                )
-                TextField(
-                    "Your message here",
-                    text: $message
-                )
+                ZStack {
+                    RoundedRectangle(cornerRadius: 30, style: .continuous)
+                        .foregroundStyle(.linearGradient(colors: [Color("JaxOrange"), Color("JaxOrange")], startPoint: .topLeading, endPoint: .bottomTrailing))
+                        .frame(width: 400, height: 100)
+                    Text("Craft a message to \(user.dbUser?.lover ?? "Unknown Lover")")
+                        .font(.system(size: 32, design: .rounded))
+                        .fontWeight(.heavy)
+                        .foregroundColor(Color.white)
+                        .frame(width:400)
+                }
+                TextEditor(text: $message)
+                    .frame(width: 375)
+                    .scrollContentBackground(.hidden)
+                    .foregroundColor(.white)
+                    .font(.system(size: 24, design: .rounded))
+                    .fontWeight(.heavy)
+                    .background(
+                        RoundedRectangle(cornerRadius: 30, style: .continuous)
+                            .fill(Color("JaxOrange")))
+                
+                NavigationLink (destination: HomePage().environmentObject(user).navigationBarBackButtonHidden(true), tag: true, selection: $valid) {
+                    Button(action: {
+                        sendMessage()
+                    }, label: {
+                        ZStack {
+                            RoundedRectangle(cornerRadius: 30, style: .continuous)
+                                .foregroundStyle(.linearGradient(colors: [Color("JaxOrange"), Color("JaxOrange")], startPoint: .topLeading, endPoint: .bottomTrailing))
+                                .frame(width: 150, height: 100)
+                            Text("Send")
+                                .font(.system(size: 24, design: .rounded))
+                                .fontWeight(.heavy)
+                                .foregroundColor(Color.white)
+                        }
+                    })
+                }
+                
+                // Error message
+                if displayError {
+                    VStack {
+                        ZStack {
+                            RoundedRectangle(cornerRadius: 30, style: .continuous)
+                                .foregroundStyle(.linearGradient(colors: [.white], startPoint: .topLeading, endPoint: .bottomTrailing))
+                                .frame(width: 350, height: 100)
+                            Text("Failure: \(errorMessage)")
+                                .frame(width: 300)
+                        }
+                        Spacer()
+                    }
+                }
+            }
+            
+        }
+    }
+    
+    func sendMessage() {
+        if message == "" {
+            return
+        }
+        
+        Task {
+            do {
+                try await user.sendMessage(message)
+                valid = true
+            } catch {
+                displayError = true
+                errorMessage = error.localizedDescription
             }
         }
     }
@@ -29,6 +92,6 @@ struct NewMessageView: View {
 
 struct NewMessageView_Previews: PreviewProvider {
     static var previews: some View {
-        NewMessageView()
+        NewMessageView().environmentObject(LocalUser())
     }
 }
