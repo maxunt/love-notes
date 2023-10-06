@@ -14,7 +14,7 @@ class LocalUser: ObservableObject {
     @Published var hasName = false
     @Published var hasLover = false
     var user: User? = nil
-    var dbUser: DBUser? = nil
+    @Published var dbUser: DBUser? = nil
     var loverDBUser: DBUser? = nil
     
     var dbManager = DataManager()
@@ -127,6 +127,13 @@ class LocalUser: ObservableObject {
         user = nil
         loverDBUser = nil
         setScreenValues()
+    }
+    
+    func refreshMessages() async throws {
+        guard let dbUser = self.dbUser else {
+            return
+        }
+        self.dbUser = try await self.getUser(dbUser)
     }
     
     func getName() -> String {

@@ -22,12 +22,13 @@ struct NewMessageView: View {
                 ZStack {
                     RoundedRectangle(cornerRadius: 30, style: .continuous)
                         .foregroundStyle(.linearGradient(colors: [Color("JaxOrange"), Color("JaxOrange")], startPoint: .topLeading, endPoint: .bottomTrailing))
-                        .frame(width: 400, height: 100)
+                        .frame(height: 100)
+                        .padding()
                     Text("Craft a message to \(user.dbUser?.lover ?? "Unknown Lover")")
                         .font(.system(size: 32, design: .rounded))
                         .fontWeight(.heavy)
                         .foregroundColor(Color.white)
-                        .frame(width:400)
+                        .padding()
                 }
                 TextEditor(text: $message)
                     .frame(width: 375)

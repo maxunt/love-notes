@@ -9,6 +9,8 @@ import SwiftUI
 
 struct HomePage: View {
     @EnvironmentObject var user: LocalUser
+    @State var displayError = false
+    @State var errorMessage = ""
     var body: some View {
         NavigationView {
             ZStack {
@@ -33,7 +35,7 @@ struct HomePage: View {
                     
                     // Messages scroll
                     ScrollView {
-                        ForEach(user.dbUser?.receivedMessages ?? ["User could not be found"], id: \.self) { message in
+                        ForEach(user.dbUser?.receivedMessages.reversed() ?? ["User could not be found"], id: \.self) { message in
                             ZStack {
                                 Text(message)
                                     .frame(width: 300)
@@ -45,9 +47,35 @@ struct HomePage: View {
                                         .fill(Color("JaxOrange")))
                             }
                         }
+                    }.refreshable {
+                        refresh()
+                    }
+                }
+                // Error message
+                if displayError {
+                    VStack {
+                        ZStack {
+                            RoundedRectangle(cornerRadius: 30, style: .continuous)
+                                .foregroundStyle(.linearGradient(colors: [.white], startPoint: .topLeading, endPoint: .bottomTrailing))
+                                .frame(width: 350, height: 100)
+                            Text("Failure: \(errorMessage)")
+                                .frame(width: 300)
+                        }
+                        Spacer()
                     }
                 }
 
+            }
+        }
+    }
+    
+    func refresh() {
+        Task {
+            do {
+                try await user.refreshMessages()
+            } catch {
+                displayError = true
+                errorMessage = error.localizedDescription
             }
         }
     }
